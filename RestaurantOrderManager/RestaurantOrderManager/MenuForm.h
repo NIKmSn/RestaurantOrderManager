@@ -102,7 +102,7 @@ namespace RestaurantOrderManager {
 				 {
 					 sqlCommand->Parameters->AddWithValue("@name", System::DBNull::Value);
 				 }
-				 sqlCommand->CommandText = "SELECT Id AS 'ID', Picture AS 'Фото', Name AS 'Название блюда', Description AS 'Описание', FORMAT(Price, 'C', 'ru-ru') AS 'Цена за 1шт/100гр' FROM Product WHERE(@id IS NULL OR Id = @id) AND (@name IS NULL OR Name = @name)";
+				 sqlCommand->CommandText = "SELECT Id AS 'ID', Picture AS 'Фото', Type AS 'Тип блюда', Name AS 'Название', Description AS 'Описание', FORMAT(Price, 'C', 'ru-ru') AS 'Цена за 1шт/100гр' FROM Product WHERE(@id IS NULL OR Id = @id) AND (@name IS NULL OR Name = @name)";
 				 try
 				 {
 					 myConnection->Open();

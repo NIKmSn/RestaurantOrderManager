@@ -8,38 +8,39 @@ private:
 	String^ email;
 	Decimal discount;
 protected:
-	//Методы заполнения и чтения полей класса
-	int GetId()
-	{
-		return id;
-	}
-
-	String^ GetEmail()
-	{
-		return email;
-	}
+	//Методы заполнения полей класса
 	void SetEmail(String^ value)
 	{
 		email = value;
 	}
 
-	Decimal GetDiscount()
-	{
-		return discount;
-	}
 	void SetDiscount(Decimal value)
 	{
 		discount = value;
 	}
 
 public: 
+	//Методы чтения полей класса
+	int GetId()
+	{
+		return id;
+	}
+	String^ GetEmail()
+	{
+		return email;
+	}
+	Decimal GetDiscount()
+	{
+		return discount;
+	}
+
 	//Конструкторы
 	Customer() :Person()
 	{
 		SetEmail("");
 		SetDiscount(0);
 	}
-	Customer(String^ email, Decimal discount)
+	Customer(String^ name, String^ phoneNumber, String^ email, Decimal discount) : Person(name, phoneNumber)
 	{
 		SetEmail(email);
 		SetDiscount(discount);
