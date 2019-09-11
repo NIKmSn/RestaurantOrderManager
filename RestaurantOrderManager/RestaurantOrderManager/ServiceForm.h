@@ -1,5 +1,6 @@
 #pragma once
 #include "Product.h"
+#include "AddNewClientForm.h"
 namespace RestaurantOrderManager {
 
 	using namespace System;
@@ -9,8 +10,8 @@ namespace RestaurantOrderManager {
 	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace System::IO;
-	using namespace System::Runtime::InteropServices;
-
+	using namespace System::Runtime::InteropServices;	
+	
 	/// <summary>
 	/// Summary for Service
 	/// </summary>
@@ -76,13 +77,16 @@ namespace RestaurantOrderManager {
 	{
 		try
 		{
-			sqlCommand->CommandText = "SELECT * FROM Customer";
+			cbCustomers->Items->Clear();
+			sqlCommand->CommandText = "SELECT * FROM Customer ORDER BY Name";
 			myConnection->Open();
 			sqlReader = sqlCommand->ExecuteReader();
 			while (sqlReader->Read())
 			{
 				cbCustomers->Items->Add(sqlReader["Name"]->ToString());
 			}
+			if (cbCustomers->Items->Count != 0)
+				cbCustomers->SelectedIndex = 0;
 		}
 		catch (Exception^ e)
 		{
@@ -95,6 +99,7 @@ namespace RestaurantOrderManager {
 	}
 	private: void FillDishTypeCombo()
 	{
+		cbName->Items->Clear();
 		Product::InitDishDictionary();
 		BindingSource^ bindSource = gcnew BindingSource(Product::dishDictionary, nullptr);
 		cbDishType->DataSource = bindSource;
@@ -105,13 +110,16 @@ namespace RestaurantOrderManager {
 	{
 		try
 		{
-			sqlCommand->CommandText = "SELECT * FROM Employee";
+			cbName->Items->Clear();
+			sqlCommand->CommandText = "SELECT * FROM Employee ORDER BY Name";
 			myConnection->Open();
 			sqlReader = sqlCommand->ExecuteReader();
 			while (sqlReader->Read())
 			{
-				cbCustomers->Items->Add(sqlReader["Name"]->ToString());
+				cbEmployee->Items->Add(sqlReader["Name"]->ToString());
 			}
+			if (cbEmployee->Items->Count != 0)
+				cbEmployee->SelectedIndex = 0;
 		}
 		catch (Exception^ e)
 		{
@@ -126,16 +134,17 @@ namespace RestaurantOrderManager {
 	{
 		try
 		{
-			//TODO: Считать значение KeyValuePair
-			String^ str = cbDishType->SelectedValue->ToString();
-			sqlCommand->Parameters["@type"]->Value = cbDishType->DisplayMember;
-			sqlCommand->CommandText = "SELECT * FROM Product WHERE Type = @type";
+			cbName->Items->Clear();
+			sqlCommand->Parameters["@type"]->Value = cbDishType->GetItemText(cbDishType->SelectedItem);
+			sqlCommand->CommandText = "SELECT * FROM Product WHERE (Type = @type) ORDER BY Name";
 			myConnection->Open();
 			sqlReader = sqlCommand->ExecuteReader();
 			while (sqlReader->Read())
 			{
-				cbCustomers->Items->Add(sqlReader["Name"]->ToString());
+				cbName->Items->Add(sqlReader["Name"]->ToString());
 			}
+			if (cbName->Items->Count != 0)
+				cbName->SelectedIndex = 0;
 		}
 		catch (Exception^ e)
 		{
@@ -197,6 +206,7 @@ namespace RestaurantOrderManager {
 			this->btnNewItem->TabIndex = 1;
 			this->btnNewItem->Text = L"Добавить";
 			this->btnNewItem->UseVisualStyleBackColor = true;
+			this->btnNewItem->Click += gcnew System::EventHandler(this, &Service::BtnNewItem_Click);
 			// 
 			// numQuantity
 			// 
@@ -243,8 +253,6 @@ namespace RestaurantOrderManager {
 			this->cbDishType->Name = L"cbDishType";
 			this->cbDishType->Size = System::Drawing::Size(195, 24);
 			this->cbDishType->TabIndex = 35;
-			this->cbDishType->SelectedIndexChanged += gcnew System::EventHandler(this, &Service::CbDishType_SelectedIndexChanged);
-			this->cbDishType->SelectionChangeCommitted += gcnew System::EventHandler(this, &Service::CbDishType_SelectionChangeCommitted);
 			this->cbDishType->SelectedValueChanged += gcnew System::EventHandler(this, &Service::CbDishType_SelectedValueChanged);
 			// 
 			// lblType
@@ -264,6 +272,7 @@ namespace RestaurantOrderManager {
 			this->cbCustomers->Name = L"cbCustomers";
 			this->cbCustomers->Size = System::Drawing::Size(195, 24);
 			this->cbCustomers->TabIndex = 41;
+			this->cbCustomers->DropDown += gcnew System::EventHandler(this, &Service::CbCustomers_DropDown);
 			// 
 			// label3
 			// 
@@ -315,6 +324,7 @@ namespace RestaurantOrderManager {
 			this->btnNewClient->TabIndex = 43;
 			this->btnNewClient->Text = L"Новый...";
 			this->btnNewClient->UseVisualStyleBackColor = true;
+			this->btnNewClient->Click += gcnew System::EventHandler(this, &Service::BtnNewClient_Click);
 			// 
 			// groupBox1
 			// 
@@ -395,25 +405,36 @@ namespace RestaurantOrderManager {
 			sqlCommand->Connection = myConnection;
 			sqlCommand->Parameters->AddWithValue("@type", "");
 			FillDishTypeCombo();
+			FillDishName();
 			FillCustomerCombo();
+			FillStaffCombo();
 		}
 		catch (Exception^ ex)
 		{
 			MessageBox::Show(ex->Message, "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
 		}
-	}
-			 
+	}			
 private: System::Void CbDishType_SelectedValueChanged(System::Object^ sender, System::EventArgs^ e) 
 {
-	
-}
-private: System::Void CbDishType_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) 
-{
 	FillDishName();
 }
-private: System::Void CbDishType_SelectionChangeCommitted(System::Object^ sender, System::EventArgs^ e) 
+private: System::Void BtnNewItem_Click(System::Object^ sender, System::EventArgs^ e) 
 {
-	FillDishName();
+
+}
+private: System::Void BtnNewClient_Click(System::Object^ sender, System::EventArgs^ e) 
+{
+	Form^ addingForm = Application::OpenForms["AddNewClientForm"];
+	if (addingForm != nullptr)
+		addingForm->BringToFront();
+	else
+	{
+		AddNewClientForm^ addingForm = gcnew AddNewClientForm();
+		addingForm->Show();
+	}
+}
+private: System::Void CbCustomers_DropDown(System::Object^ sender, System::EventArgs^ e) {
+	FillCustomerCombo();
 }
 };
 }

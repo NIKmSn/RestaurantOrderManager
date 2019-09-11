@@ -354,7 +354,7 @@ namespace RestaurantOrderManager {
 	}
 private: System::Void BtnService_Click(System::Object^ sender, System::EventArgs^ e) 
 {
-	Form^ serviceForm = Application::OpenForms["ServiceForm"];
+	Form^ serviceForm = Application::OpenForms["Service"];
 	if (serviceForm != nullptr)
 		serviceForm->BringToFront();
 	else

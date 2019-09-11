@@ -140,7 +140,6 @@
     <ClCompile Include="Employee.cpp" />
     <ClCompile Include="Invoice.cpp" />
     <ClCompile Include="MainForm.cpp" />
-    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="MenuForm.cpp" />
     <ClCompile Include="Order.cpp" />
     <ClCompile Include="OrderListForm.cpp" />
@@ -165,7 +164,6 @@
     <ClInclude Include="MainForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>

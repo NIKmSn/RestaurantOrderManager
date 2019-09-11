@@ -13,18 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Orders">
-      <UniqueIdentifier>{6d332ce8-8dd2-4658-9d80-b147493b82a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Menu">
-      <UniqueIdentifier>{d277cd99-b704-42bc-90e1-80715c4f6edf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Staff">
-      <UniqueIdentifier>{37f22473-9918-406f-b52e-7357047f116e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Product">
-      <UniqueIdentifier>{d7fc4cf8-d6b1-4637-a3df-07f3c22de2d8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainForm.cpp">
@@ -43,9 +31,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Product.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Person.cpp">
@@ -99,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Order.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Product.h">

@@ -20,7 +20,6 @@ namespace RestaurantOrderManager {
 		SqlCommand^ sqlCommand = gcnew SqlCommand();
 		SqlDataAdapter^ sda = gcnew SqlDataAdapter();
 		DataTable^ dbDataSet = gcnew DataTable();
-
 	public:
 		AddNewClientForm(void)
 		{
@@ -29,6 +28,8 @@ namespace RestaurantOrderManager {
 			//TODO: Add the constructor code here
 			//
 		}
+
+
 
 	protected:
 		/// <summary>
@@ -53,12 +54,6 @@ namespace RestaurantOrderManager {
 	private: System::Windows::Forms::TextBox^ tbName;
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::NumericUpDown^ numericUpDown1;
-
-
-
-
-
-
 
 	protected:
 
@@ -240,6 +235,7 @@ namespace RestaurantOrderManager {
 			this->Controls->Add(this->label1);
 			this->Name = L"AddNewClientForm";
 			this->Text = L"AddNewClientForm";
+			this->Load += gcnew System::EventHandler(this, &AddNewClientForm::AddNewClientForm_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDown1))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
@@ -257,7 +253,7 @@ namespace RestaurantOrderManager {
 			sqlCommand->Parameters->AddWithValue("@name", newCustomer->GetName());
 			sqlCommand->Parameters->AddWithValue("@phone", newCustomer->GetPhoneNumber());
 			sqlCommand->Parameters->AddWithValue("@email", newCustomer->GetEmail());
-			sqlCommand->Parameters->AddWithValue("@salary", newCustomer->GetDiscount());
+			sqlCommand->Parameters->AddWithValue("@discount", newCustomer->GetDiscount());
 			try
 			{
 				myConnection->Open();
