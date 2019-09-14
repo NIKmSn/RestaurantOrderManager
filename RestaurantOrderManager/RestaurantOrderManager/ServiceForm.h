@@ -1,6 +1,9 @@
 #pragma once
 #include "Product.h"
 #include "AddNewClientForm.h"
+#include "Item.h"
+#include "Order.h"
+#include "Invoice.h"
 namespace RestaurantOrderManager {
 
 	using namespace System;
@@ -42,7 +45,9 @@ namespace RestaurantOrderManager {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::DataGridView^ dataGridView1;
+	private: System::Windows::Forms::DataGridView^ dgvItems;
+	protected:
+
 	protected:
 	private: System::Windows::Forms::Button^ btnNewItem;
 	private: System::Windows::Forms::NumericUpDown^ numQuantity;
@@ -155,6 +160,10 @@ namespace RestaurantOrderManager {
 			myConnection->Close();
 		}
 	}
+	private: Item^ CreateNewItem()
+	{
+		
+	}
 #pragma region Windows Form Designer generated code
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -162,7 +171,7 @@ namespace RestaurantOrderManager {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
+			this->dgvItems = (gcnew System::Windows::Forms::DataGridView());
 			this->btnNewItem = (gcnew System::Windows::Forms::Button());
 			this->numQuantity = (gcnew System::Windows::Forms::NumericUpDown());
 			this->label2 = (gcnew System::Windows::Forms::Label());
@@ -180,7 +189,7 @@ namespace RestaurantOrderManager {
 			this->groupEmployee = (gcnew System::Windows::Forms::GroupBox());
 			this->label5 = (gcnew System::Windows::Forms::Label());
 			this->cbEmployee = (gcnew System::Windows::Forms::ComboBox());
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvItems))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->BeginInit();
 			this->groupCustomer->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numTable))->BeginInit();
@@ -188,15 +197,15 @@ namespace RestaurantOrderManager {
 			this->groupEmployee->SuspendLayout();
 			this->SuspendLayout();
 			// 
-			// dataGridView1
+			// dgvItems
 			// 
-			this->dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->dataGridView1->Location = System::Drawing::Point(12, 96);
-			this->dataGridView1->Name = L"dataGridView1";
-			this->dataGridView1->RowHeadersWidth = 51;
-			this->dataGridView1->RowTemplate->Height = 24;
-			this->dataGridView1->Size = System::Drawing::Size(484, 491);
-			this->dataGridView1->TabIndex = 0;
+			this->dgvItems->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dgvItems->Location = System::Drawing::Point(12, 96);
+			this->dgvItems->Name = L"dgvItems";
+			this->dgvItems->RowHeadersWidth = 51;
+			this->dgvItems->RowTemplate->Height = 24;
+			this->dgvItems->Size = System::Drawing::Size(484, 491);
+			this->dgvItems->TabIndex = 0;
 			// 
 			// btnNewItem
 			// 
@@ -379,12 +388,12 @@ namespace RestaurantOrderManager {
 			this->Controls->Add(this->groupEmployee);
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->groupCustomer);
-			this->Controls->Add(this->dataGridView1);
+			this->Controls->Add(this->dgvItems);
 			this->Margin = System::Windows::Forms::Padding(4);
 			this->Name = L"Service";
 			this->Text = L"Service";
 			this->Load += gcnew System::EventHandler(this, &Service::Service_Load);
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvItems))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->EndInit();
 			this->groupCustomer->ResumeLayout(false);
 			this->groupCustomer->PerformLayout();
@@ -404,6 +413,7 @@ namespace RestaurantOrderManager {
 			myConnection = gcnew SqlConnection(connStr);
 			sqlCommand->Connection = myConnection;
 			sqlCommand->Parameters->AddWithValue("@type", "");
+			sqlCommand->Parameters->AddWithValue("@dishname", "");
 			FillDishTypeCombo();
 			FillDishName();
 			FillCustomerCombo();
@@ -420,6 +430,12 @@ private: System::Void CbDishType_SelectedValueChanged(System::Object^ sender, Sy
 }
 private: System::Void BtnNewItem_Click(System::Object^ sender, System::EventArgs^ e) 
 {
+	//CreateNewItem();
+	//List<Item^> items;
+
+	sqlCommand->CommandText = "SELECT Id FROM Product WHERE Type = @type AND Name = @dishname"
+	Item^ newItem = Item(cbDishType)
+	dgvItems->Rows->Add();
 
 }
 private: System::Void BtnNewClient_Click(System::Object^ sender, System::EventArgs^ e) 
@@ -433,7 +449,8 @@ private: System::Void BtnNewClient_Click(System::Object^ sender, System::EventAr
 		addingForm->Show();
 	}
 }
-private: System::Void CbCustomers_DropDown(System::Object^ sender, System::EventArgs^ e) {
+private: System::Void CbCustomers_DropDown(System::Object^ sender, System::EventArgs^ e) 
+{
 	FillCustomerCombo();
 }
 };
