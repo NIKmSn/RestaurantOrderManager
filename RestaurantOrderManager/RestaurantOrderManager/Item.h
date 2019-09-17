@@ -18,16 +18,16 @@ ref class Item
 private:
 	//Поля
 	int id;
-	String^ item;
+	//String^ item;
 	int customerId;
 	int tableId;
 	DateTime^ date;
 protected:
 	//Методы заполнения полей
-	void SetItem(String^ value)
+	/*void SetItem(String^ value)
 	{
 		item = value;
-	}
+	}*/
 
 	void SetCustomerId(int value)
 	{
@@ -50,10 +50,10 @@ public:
 		return id;
 	}
 
-	String^ GetItem()
+	/*String^ GetItem()
 	{
 		return item;
-	}
+	}*/
 
 	int GetCustomerId()
 	{
@@ -73,16 +73,16 @@ public:
 	//Конструкторы
 	Item()
 	{
-		SetItem("");
+		//SetItem("");
 		SetCustomerId(-1);
-		SetTableId(-1);
+		//SetTableId(-1);
 		SetDate(gcnew DateTime);
 	}
 	Item(String^ item, int customerId, int tableId, DateTime^ date)
 	{
-		SetItem(item);
+		//SetItem(item);
 		SetCustomerId(customerId);
-		SetTableId(tableId);
+		//SetTableId(tableId);
 		SetDate(date);
 	}
 };
