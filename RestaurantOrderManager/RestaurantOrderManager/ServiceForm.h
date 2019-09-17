@@ -140,8 +140,8 @@ namespace RestaurantOrderManager {
 		try
 		{
 			cbName->Items->Clear();
-			sqlCommand->Parameters["@type"]->Value = cbDishType->GetItemText(cbDishType->SelectedItem);
-			sqlCommand->CommandText = "SELECT * FROM Product WHERE (Type = @type) ORDER BY Name";
+			sqlCommand->Parameters["@product_type"]->Value = cbDishType->GetItemText(cbDishType->SelectedItem);
+			sqlCommand->CommandText = "SELECT * FROM Product WHERE (Type = @product_type) ORDER BY Name";
 			myConnection->Open();
 			sqlReader = sqlCommand->ExecuteReader();
 			while (sqlReader->Read())
@@ -160,10 +160,7 @@ namespace RestaurantOrderManager {
 			myConnection->Close();
 		}
 	}
-	private: Item^ CreateNewItem()
-	{
-		
-	}
+
 #pragma region Windows Form Designer generated code
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -412,8 +409,11 @@ namespace RestaurantOrderManager {
 		{
 			myConnection = gcnew SqlConnection(connStr);
 			sqlCommand->Connection = myConnection;
-			sqlCommand->Parameters->AddWithValue("@type", "");
-			sqlCommand->Parameters->AddWithValue("@dishname", "");
+			sqlCommand->Parameters->AddWithValue("@product_type", "");
+			sqlCommand->Parameters->AddWithValue("@product_name", "");
+			sqlCommand->Parameters->AddWithValue("@item_invoiceId", "");
+			sqlCommand->Parameters->AddWithValue("@item_productId", "");
+			sqlCommand->Parameters->AddWithValue("@item_quantity", "");
 			FillDishTypeCombo();
 			FillDishName();
 			FillCustomerCombo();
@@ -430,13 +430,27 @@ private: System::Void CbDishType_SelectedValueChanged(System::Object^ sender, Sy
 }
 private: System::Void BtnNewItem_Click(System::Object^ sender, System::EventArgs^ e) 
 {
-	//CreateNewItem();
-	//List<Item^> items;
+	try
+	{
+		myConnection->Open();
+		sqlCommand->Parameters["@product_name"]->Value = cbName->GetItemText(cbName->SelectedItem);
+		sqlCommand->CommandText = "SELECT Id FROM Product WHERE (Type = @product_type AND Name = @product_name)";
+		sqlCommand->Parameters["@item_productId"]->Value = sqlCommand->ExecuteScalar();
+		int productId = (int)sqlCommand->Parameters["@item_productId"]->Value;
+		Decimal quantity = numQuantity->Value;
+		Item^ newItem = Item()
+		
+		//dgvItems->Rows->Add();
 
-	sqlCommand->CommandText = "SELECT Id FROM Product WHERE Type = @type AND Name = @dishname"
-	Item^ newItem = Item(cbDishType)
-	dgvItems->Rows->Add();
-
+	}
+	catch (Exception^ e)
+	{
+		MessageBox::Show(e->Message, "Ошибка доступа к базе", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	finally
+	{
+		myConnection->Close();
+	}
 }
 private: System::Void BtnNewClient_Click(System::Object^ sender, System::EventArgs^ e) 
 {

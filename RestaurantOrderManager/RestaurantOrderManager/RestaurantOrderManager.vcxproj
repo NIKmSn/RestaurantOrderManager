@@ -137,6 +137,7 @@
     <ClCompile Include="AddNewClientForm.cpp" />
     <ClCompile Include="AddProductForm.cpp" />
     <ClCompile Include="Customer.cpp" />
+    <ClCompile Include="Database.cpp" />
     <ClCompile Include="Employee.cpp" />
     <ClCompile Include="Invoice.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -160,6 +161,7 @@
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Customer.h" />
+    <ClInclude Include="Database.h" />
     <ClInclude Include="Employee.h" />
     <ClInclude Include="Invoice.h" />
     <ClInclude Include="Item.h" />
