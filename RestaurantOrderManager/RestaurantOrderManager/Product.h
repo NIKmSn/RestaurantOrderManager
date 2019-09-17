@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Database.h"
 #include <map>
 using namespace std;
 using namespace System;
@@ -8,16 +8,11 @@ using namespace System::Collections;
 using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
-using namespace std;
-using namespace System::Data::Sql;
-using namespace System::Data::SqlClient;
-using namespace System::Data::SqlTypes;
-using namespace Microsoft::SqlServer::Server;
-using namespace System::Runtime::InteropServices;
-using namespace System::Collections::Generic;
+
 
 ref class Product
 {
+private: Dictionary<int, Product^> productCache;
 private:
 	//Поля
 	int id;
@@ -27,10 +22,23 @@ private:
 	Decimal price;
 	String^ photo;
 	
+	//Принудительно присвоить значение полю ID (для создания экземпляра при чтении из БД)
+	private: void SetId(int value)
+	{
+		id = value;
+	}
 
 
 protected:
 	//Методы заполнения полей класса
+	void SetId()
+	{
+		SqlConnection^ conn = Database::CreateConnection();
+		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT MAX(Id) FROM Product", conn);
+		conn->Open();
+		id = (int)sqlCommand->ExecuteScalar();
+		conn->Close();
+	}
 	void SetName(String^ value)
 	{
 		name = value;
@@ -122,7 +130,27 @@ public:
 			dishDictionary->Add((int)DishType::Other, "Другое");
 		}
 	}
+	Product^ GetProduct(int id)
+	{
+		if (productCache.ContainsKey(id))
+		{
+			return productCache[id];
+		}
+		SqlConnection^ conn = Database::CreateOpenConnection();
+		SqlCommand^ sqlCommand = Database::CreateStoredProcedureCommand("SELECT * FROM Product WHERE Id = @id", conn);
+		sqlCommand->Parameters->Add("@id", SqlDbType::Int)->Value = 1;
+		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
+		conn->Close();
+		
+		if (sqlReader->Read)
+		{
+			Product^ product = gcnew Product(id, Convert::ToInt32(sqlReader["Type"]), sqlReader["Name"]->ToString(), sqlReader["Description"]->ToString(), Convert::ToDecimal(sqlReader["Price"]), sqlReader["Picture"]->ToString());
+			productCache.Add(id, product);
+			return product;
+		}
+		return nullptr;
 
+	}
 
 	//Методы чтения полей класса
 	int GetId()
@@ -153,6 +181,7 @@ public:
 	//Конструкторы
 	Product() 
 	{
+		SetId(0);
 		SetDishType(0);
 		SetName("");
 		SetDescription("");
@@ -161,11 +190,22 @@ public:
 	}
 	Product(int dishType, String^ name, String^ description, Decimal price, String^ photo)
 	{
+		SetId();
 		SetDishType(dishType);
 		SetName(name);
 		SetDescription(description);
 		SetPrice(price);
 		SetPhoto(photo);
 	}
+	Product(int id, int dishType, String^ name, String^ description, Decimal price, String^ photo)
+	{
+		SetId(id);
+		SetDishType(dishType);
+		SetName(name);
+		SetDescription(description);
+		SetPrice(price);
+		SetPhoto(photo);
+	}
+
 };
 
