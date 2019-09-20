@@ -12,7 +12,7 @@ using namespace System::Drawing;
 
 ref class Product
 {
-private: Dictionary<int, Product^> productCache;
+private: static Dictionary<int, Product^> productCache;
 private:
 	//Поля
 	int id;
@@ -130,7 +130,7 @@ public:
 			dishDictionary->Add((int)DishType::Other, "Другое");
 		}
 	}
-	Product^ GetProduct(int id)
+	static Product^ GetProduct(int id)
 	{
 		if (productCache.ContainsKey(id))
 		{
@@ -142,7 +142,7 @@ public:
 		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
 		conn->Close();
 		
-		if (sqlReader->Read)
+		if (sqlReader->Read())
 		{
 			Product^ product = gcnew Product(id, Convert::ToInt32(sqlReader["Type"]), sqlReader["Name"]->ToString(), sqlReader["Description"]->ToString(), Convert::ToDecimal(sqlReader["Price"]), sqlReader["Picture"]->ToString());
 			productCache.Add(id, product);
