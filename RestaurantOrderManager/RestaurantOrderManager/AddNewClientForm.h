@@ -273,7 +273,7 @@ namespace RestaurantOrderManager {
 		}
 		else
 		{
-			MessageBox::Show("Не удалось добавить нового сотрудника", "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+			MessageBox::Show("Не удалось добавить нового клиента", "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
 		}
 	}
 	private: System::Void AddNewClientForm_Load(System::Object^ sender, System::EventArgs^ e)
