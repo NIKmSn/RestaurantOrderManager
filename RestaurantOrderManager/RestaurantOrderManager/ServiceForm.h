@@ -4,6 +4,7 @@
 #include "Item.h"
 #include "Order.h"
 #include "Invoice.h"
+#include "Item.h"
 namespace RestaurantOrderManager {
 
 	using namespace System;
@@ -438,7 +439,7 @@ private: System::Void BtnNewItem_Click(System::Object^ sender, System::EventArgs
 		sqlCommand->Parameters["@item_productId"]->Value = sqlCommand->ExecuteScalar();
 		int productId = (int)sqlCommand->Parameters["@item_productId"]->Value;
 		Decimal quantity = numQuantity->Value;
-		Item^ newItem = Item()
+		Item^ newItem = gcnew Item();
 		
 		//dgvItems->Rows->Add();
 

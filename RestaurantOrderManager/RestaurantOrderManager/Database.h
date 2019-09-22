@@ -65,17 +65,17 @@ public: static SqlDataAdapter^ CreateDataAdapter()
 {
 	return gcnew SqlDataAdapter();
 }
-public: static SqlDataReader^ CreateSqlReader()
-{
-	return gcnew SqlDataReader();
-}
+//public: static SqlDataReader^ CreateSqlReader()
+//{
+//	return gcnew SqlDataReader();
+//}
 public: static SqlParameter^ CreateParameter(String^ parameterName, Object^ parameterValue)
 {
 	return gcnew SqlParameter(parameterName, parameterValue);
 }
 
 public: static Database database;
-public: static SqlDataReader^ sqlReader = CreateSqlReader();
+public: static SqlDataReader^ sqlReader;
 //public: SqlCommand^ GetProduct()
 //{
 //	SqlCommand^ sqlCommand = gcnew SqlCommand();
