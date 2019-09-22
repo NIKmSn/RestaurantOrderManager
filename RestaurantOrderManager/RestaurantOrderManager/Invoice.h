@@ -3,6 +3,7 @@
 #include "Product.h"
 #include "Customer.h"
 #include "Item.h"
+#include "Employee.h"
 using namespace std;
 using namespace System;
 using namespace System::ComponentModel;
@@ -137,8 +138,34 @@ public:
 		SetEmployee(employee);
 		SetDate(date);
 	}
-	public: Invoice^ GetInvoice(SqlDataReader^ sqlReader)
+	public: static Invoice^ GetInvoice(SqlDataReader^ sqlReader)
 	{
+		if (sqlReader->Read())
+		{
+			Invoice^ invoice = gcnew Invoice();
+			invoice->SetId(Convert::ToInt32(sqlReader["Id"]));
+			invoice->SetCustomer(Customer::GetCustomer(Convert::ToInt32(sqlReader["CustomerId"])));
+			List<Item^>^ items = Item::GetItems(Convert::ToInt32(sqlReader["Id"]));
+			invoice->SetItems(items);
+			double total = 0;
+			for each (Item ^ item in items)
+			{
+				total += Convert::ToDouble(item->GetProduct()->GetPrice() * (1 - invoice->GetCustomer()->GetDiscount()));
+			}
+			invoice->SetTotal(total);
+			invoice->SetEmployee(Employee::GetEmployee(Convert::ToInt32(sqlReader["EmployeeId"])));
+			invoice->SetDate(Convert::ToDateTime(sqlReader["Date"]));
+			return invoice;
+		}
+		return nullptr;
+	}
+	public: static Invoice^ GetInvoice(int id)
+	{
+		SqlConnection^ conn = Database::CreateOpenConnection();
+		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Invoice WHERE Id = @id", conn);
+		sqlCommand->Parameters->Add("@id", SqlDbType::Int)->Value = 1;
+		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
+
 		if (sqlReader->Read())
 		{
 			Invoice^ invoice = gcnew Invoice();
@@ -149,7 +176,7 @@ public:
 			double total = 0;
 			for each (Item ^ item in items)
 			{
-				total += Convert::ToDouble(item->GetProduct()->GetPrice() * (1 - GetCustomer()->GetDiscount()));
+				total += Convert::ToDouble(item->GetProduct()->GetPrice() * (1 - invoice->GetCustomer()->GetDiscount()));
 			}
 			invoice->SetTotal(total);
 			invoice->SetEmployee(Employee::GetEmployee(Convert::ToInt32(sqlReader["EmployeeId"])));
@@ -158,7 +185,7 @@ public:
 		}
 		return nullptr;
 	}
-	public: List<Invoice^>^ GetInvoices()
+	public: static List<Invoice^>^ GetInvoices()
 	{
 		List<Invoice^>^ invoices;
 		SqlConnection^ conn = Database::CreateOpenConnection();
