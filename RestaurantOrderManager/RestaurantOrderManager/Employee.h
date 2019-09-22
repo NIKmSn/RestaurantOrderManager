@@ -1,5 +1,6 @@
 #pragma once
 #include "Person.h"
+#include "Database.h"
 ref class Employee :
 	public Person
 {
