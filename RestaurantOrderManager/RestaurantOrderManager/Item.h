@@ -1,4 +1,5 @@
 #pragma once
+#include "Product.h"
 using namespace std;
 using namespace System;
 using namespace System::ComponentModel;
@@ -19,9 +20,14 @@ private:
 	//Поля
 	int id;
 	//String^ item;
-	int customerId;
-	int tableId;
-	DateTime^ date;
+	int invoiceId;
+	Product^ product;
+	int quantity;
+	Decimal cost;
+private: void SetId(int value)
+{
+	id = value;
+}
 protected:
 	//Методы заполнения полей
 	/*void SetItem(String^ value)
@@ -29,19 +35,33 @@ protected:
 		item = value;
 	}*/
 
-	void SetCustomerId(int value)
+	void SetId()
 	{
-		customerId = value;
+		SqlConnection^ conn = Database::CreateConnection();
+		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT MAX(Id) FROM Item", conn);
+		conn->Open();
+		id = (int)sqlCommand->ExecuteScalar();
+		conn->Close();
 	}
 
-	void SetTableId(int value)
+	void SetInvoiceId(int value)
 	{
-		tableId = value;
+		invoiceId = value;
 	}
 
-	void SetDate(DateTime^ value)
+	void SetProduct(Product^ value)
 	{
-		date = value;
+		product = value;
+	}
+
+	void SetQuantity(int value)
+	{
+		quantity = value;
+	}
+
+	void SetCost(Decimal value)
+	{
+		cost = value;
 	}
 public:
 	//Методы чтения полей
@@ -55,35 +75,74 @@ public:
 		return item;
 	}*/
 
-	int GetCustomerId()
+	int GetInvoiceId()
 	{
-		return customerId;
+		return invoiceId;
 	}
 
-	int GetTableId()
+	Product^ GetProduct()
 	{
-		return tableId;
+		return product;
 	}
 
-	DateTime^ GetDate()
+	int GetQuantity()
 	{
-		return date;
+		return quantity;
 	}
 
+	Decimal GetCost()
+	{
+		return cost;
+	}
 	//Конструкторы
 	Item()
 	{
+		SetId(0);
 		//SetItem("");
-		SetCustomerId(-1);
-		//SetTableId(-1);
-		SetDate(gcnew DateTime);
+		SetInvoiceId(0);
+		SetProduct(nullptr);
+		SetQuantity(0);
+		SetCost(0);
 	}
-	Item(String^ item, int customerId, int tableId, DateTime^ date)
+	Item(int id, int invoiceId, Product^ product, int quantity, Decimal cost)
 	{
 		//SetItem(item);
-		SetCustomerId(customerId);
-		//SetTableId(tableId);
-		SetDate(date);
+		SetId(id);
+		SetInvoiceId(invoiceId);
+		SetProduct(product);
+		SetQuantity(quantity);
+		SetCost(cost);
+	}
+	static Item^ GetItem(SqlDataReader^ sqlReader)
+	{
+		if (sqlReader->Read())
+		{
+			//TODO: Исправить InvoiceId
+			Item^ item = gcnew Item();
+			item->SetId(Convert::ToInt32(sqlReader["Id"]));
+			item->SetInvoiceId(0);
+			Product^ product = Product::GetProduct(Convert::ToInt32(sqlReader["Id"]));
+			item->SetProduct(product);
+			item->SetQuantity(Convert::ToInt32(sqlReader["Quantity"]));
+			item->SetCost(item->GetQuantity() * product->GetPrice());
+			return item;
+		}
+		return nullptr;
+	}
+	static List<Item^>^ GetItems(int invoiceId)
+	{
+		List<Item^>^ items = gcnew List<Item^>();
+		SqlConnection^ conn = Database::CreateOpenConnection();
+		SqlCommand^ sqlCommand = Database::CreateStoredProcedureCommand("SELECT * FROM Item WHERE InvoiceId = @invoiceId", conn);
+		sqlCommand->Parameters->Add("@invoiceId", SqlDbType::Int)->Value = 1;
+		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
+		conn->Close();
+
+		while (sqlReader->Read())
+		{
+			items->Add(GetItem(sqlReader));
+		}
+		return items;
 	}
 };
 
