@@ -61,30 +61,69 @@ public:
 		SetDiscount(discount);
 	}
 
+public: double CalcDiscount(double price)
+{
+	return price * Convert::ToDouble(1 - GetDiscount());
+}
 public: static Customer^ GetCustomer(int id)
 {
-	if (customerCache.ContainsKey(id))
-	{
-		return customerCache[id];
-	}
-
 	SqlConnection^ conn = Database::CreateOpenConnection();
-	SqlCommand^ sqlCommand = Database::CreateStoredProcedureCommand("SELECT * FROM Customer WHERE Id = @id", conn);
-	sqlCommand->Parameters->Add("@id", SqlDbType::Int)->Value = 1;
-	SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
-	conn->Close();
-	if (sqlReader->Read())
+	try
 	{
-		Customer^ customer = gcnew Customer();
-		customer->SetId(id);
-		customer->SetDiscount(Convert::ToDecimal(sqlReader["Discount"]));
-		customer->SetName(sqlReader["Name"]->ToString());
-		customer->SetPhoneNumber(sqlReader["PhoneNumber"]->ToString());
-		customer->SetEmail(sqlReader["Email"]->ToString());
-		customerCache.Add(id, customer);
-		return customer;
+		/*if (customerCache.ContainsKey(id))
+		{
+			return customerCache[id];
+		}*/
+		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Customer WHERE Id = @id", conn);
+		sqlCommand->Parameters->Add("@id", SqlDbType::Int)->Value = id;
+		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
+
+		if (sqlReader->Read())
+		{
+			Customer^ customer = gcnew Customer();
+			customer->SetId(Convert::ToInt32(sqlReader["Id"]));
+			customer->SetDiscount(Convert::ToDecimal(sqlReader["Discount"]));
+			customer->SetName(sqlReader["Name"]->ToString());
+			customer->SetPhoneNumber(sqlReader["PhoneNumber"]->ToString());
+			customer->SetEmail(sqlReader["Email"]->ToString());
+			//customerCache.Add(id, customer);
+			return customer;
+		}
+
 	}
-	return nullptr;
+	catch (Exception^ e)
+	{
+		MessageBox::Show(e->Message, "Ошибка доступа к базе данных", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		return nullptr;
+	}
+	finally
+	{
+		conn->Close();
+	}
+}
+public: static Customer^ GetCustomerByName(String^ name)
+{
+	SqlConnection^ conn = Database::CreateOpenConnection();
+	try
+	{
+		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Customer WHERE Name = @name", conn);
+		sqlCommand->Parameters->Add("@name", SqlDbType::NVarChar)->Value = name;
+		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
+		if (sqlReader->Read())
+		{
+			return GetCustomer(Convert::ToInt32(sqlReader["Id"]));
+		}
+		
+	}
+	catch (Exception^ e)
+	{
+		MessageBox::Show(e->Message, "Ошибка доступа к базе данных", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		return nullptr;
+	}
+	finally
+	{
+		conn->Close();
+	}
 }
 };
 

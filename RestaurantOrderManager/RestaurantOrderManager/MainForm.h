@@ -3,6 +3,7 @@
 #include "StaffForm.h"
 #include "MenuForm.h"
 #include "ServiceForm.h"
+#include "CustomersForm.h"
 namespace RestaurantOrderManager {
 
 	using namespace System;
@@ -40,7 +41,8 @@ namespace RestaurantOrderManager {
 	private: System::Windows::Forms::PictureBox^ picLogo;
 	protected:
 	private: System::Windows::Forms::Button^ btnOrderList;
-	private: System::Windows::Forms::Button^ btnStatistics;
+	private: System::Windows::Forms::Button^ btnCustomers;
+
 	private: System::Windows::Forms::Button^ btnMenu;
 	private: System::Windows::Forms::Button^ btnService;
 
@@ -70,7 +72,7 @@ namespace RestaurantOrderManager {
 			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MainForm::typeid));
 			this->picLogo = (gcnew System::Windows::Forms::PictureBox());
 			this->btnOrderList = (gcnew System::Windows::Forms::Button());
-			this->btnStatistics = (gcnew System::Windows::Forms::Button());
+			this->btnCustomers = (gcnew System::Windows::Forms::Button());
 			this->btnMenu = (gcnew System::Windows::Forms::Button());
 			this->btnService = (gcnew System::Windows::Forms::Button());
 			this->btnStaff = (gcnew System::Windows::Forms::Button());
@@ -92,9 +94,9 @@ namespace RestaurantOrderManager {
 			// 
 			this->picLogo->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"picLogo.Image")));
 			this->picLogo->Location = System::Drawing::Point(24, 167);
-			this->picLogo->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->picLogo->Margin = System::Windows::Forms::Padding(4);
 			this->picLogo->Name = L"picLogo";
-			this->picLogo->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->picLogo->Padding = System::Windows::Forms::Padding(4);
 			this->picLogo->Size = System::Drawing::Size(565, 427);
 			this->picLogo->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
 			this->picLogo->TabIndex = 0;
@@ -106,10 +108,10 @@ namespace RestaurantOrderManager {
 			this->btnOrderList->Font = (gcnew System::Drawing::Font(L"Calibri", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
 			this->btnOrderList->Location = System::Drawing::Point(617, 194);
-			this->btnOrderList->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnOrderList->Margin = System::Windows::Forms::Padding(4);
 			this->btnOrderList->MinimumSize = System::Drawing::Size(221, 64);
 			this->btnOrderList->Name = L"btnOrderList";
-			this->btnOrderList->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnOrderList->Padding = System::Windows::Forms::Padding(4);
 			this->btnOrderList->Size = System::Drawing::Size(316, 98);
 			this->btnOrderList->TabIndex = 2;
 			this->btnOrderList->Text = L"Журнал заказов";
@@ -117,21 +119,22 @@ namespace RestaurantOrderManager {
 			this->btnOrderList->UseVisualStyleBackColor = true;
 			this->btnOrderList->Click += gcnew System::EventHandler(this, &MainForm::BtnOrderList_Click);
 			// 
-			// btnStatistics
+			// btnCustomers
 			// 
-			this->btnStatistics->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Right));
-			this->btnStatistics->Font = (gcnew System::Drawing::Font(L"Calibri", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->btnCustomers->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Right));
+			this->btnCustomers->Font = (gcnew System::Drawing::Font(L"Calibri", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->btnStatistics->Location = System::Drawing::Point(617, 454);
-			this->btnStatistics->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
-			this->btnStatistics->MinimumSize = System::Drawing::Size(221, 64);
-			this->btnStatistics->Name = L"btnStatistics";
-			this->btnStatistics->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
-			this->btnStatistics->Size = System::Drawing::Size(316, 98);
-			this->btnStatistics->TabIndex = 4;
-			this->btnStatistics->Text = L"Статистика";
-			this->btnStatistics->TextAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->btnStatistics->UseVisualStyleBackColor = true;
+			this->btnCustomers->Location = System::Drawing::Point(617, 454);
+			this->btnCustomers->Margin = System::Windows::Forms::Padding(4);
+			this->btnCustomers->MinimumSize = System::Drawing::Size(221, 64);
+			this->btnCustomers->Name = L"btnCustomers";
+			this->btnCustomers->Padding = System::Windows::Forms::Padding(4);
+			this->btnCustomers->Size = System::Drawing::Size(316, 98);
+			this->btnCustomers->TabIndex = 4;
+			this->btnCustomers->Text = L"Клиенты";
+			this->btnCustomers->TextAlign = System::Drawing::ContentAlignment::MiddleRight;
+			this->btnCustomers->UseVisualStyleBackColor = true;
+			this->btnCustomers->Click += gcnew System::EventHandler(this, &MainForm::BtnCustomers_Click);
 			// 
 			// btnMenu
 			// 
@@ -139,10 +142,10 @@ namespace RestaurantOrderManager {
 			this->btnMenu->Font = (gcnew System::Drawing::Font(L"Calibri", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
 			this->btnMenu->Location = System::Drawing::Point(617, 583);
-			this->btnMenu->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnMenu->Margin = System::Windows::Forms::Padding(4);
 			this->btnMenu->MinimumSize = System::Drawing::Size(221, 64);
 			this->btnMenu->Name = L"btnMenu";
-			this->btnMenu->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnMenu->Padding = System::Windows::Forms::Padding(4);
 			this->btnMenu->Size = System::Drawing::Size(316, 98);
 			this->btnMenu->TabIndex = 5;
 			this->btnMenu->Text = L"Меню";
@@ -160,10 +163,10 @@ namespace RestaurantOrderManager {
 			this->btnService->ForeColor = System::Drawing::SystemColors::ControlText;
 			this->btnService->ImageAlign = System::Drawing::ContentAlignment::MiddleLeft;
 			this->btnService->Location = System::Drawing::Point(617, 70);
-			this->btnService->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnService->Margin = System::Windows::Forms::Padding(4);
 			this->btnService->MinimumSize = System::Drawing::Size(221, 64);
 			this->btnService->Name = L"btnService";
-			this->btnService->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnService->Padding = System::Windows::Forms::Padding(4);
 			this->btnService->Size = System::Drawing::Size(316, 98);
 			this->btnService->TabIndex = 1;
 			this->btnService->Text = L"Обслуживание";
@@ -177,10 +180,10 @@ namespace RestaurantOrderManager {
 			this->btnStaff->Font = (gcnew System::Drawing::Font(L"Calibri", 14.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
 			this->btnStaff->Location = System::Drawing::Point(617, 321);
-			this->btnStaff->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnStaff->Margin = System::Windows::Forms::Padding(4);
 			this->btnStaff->MinimumSize = System::Drawing::Size(221, 64);
 			this->btnStaff->Name = L"btnStaff";
-			this->btnStaff->Padding = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->btnStaff->Padding = System::Windows::Forms::Padding(4);
 			this->btnStaff->Size = System::Drawing::Size(316, 98);
 			this->btnStaff->TabIndex = 3;
 			this->btnStaff->Text = L"Сотрудники";
@@ -195,7 +198,7 @@ namespace RestaurantOrderManager {
 				static_cast<System::Int32>(static_cast<System::Byte>(224)));
 			this->pictureBox1->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pictureBox1.Image")));
 			this->pictureBox1->Location = System::Drawing::Point(629, 85);
-			this->pictureBox1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->pictureBox1->Margin = System::Windows::Forms::Padding(4);
 			this->pictureBox1->Name = L"pictureBox1";
 			this->pictureBox1->Size = System::Drawing::Size(100, 68);
 			this->pictureBox1->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
@@ -209,7 +212,7 @@ namespace RestaurantOrderManager {
 				static_cast<System::Int32>(static_cast<System::Byte>(224)));
 			this->pictureBox2->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pictureBox2.Image")));
 			this->pictureBox2->Location = System::Drawing::Point(629, 337);
-			this->pictureBox2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->pictureBox2->Margin = System::Windows::Forms::Padding(4);
 			this->pictureBox2->Name = L"pictureBox2";
 			this->pictureBox2->Size = System::Drawing::Size(100, 68);
 			this->pictureBox2->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
@@ -223,7 +226,7 @@ namespace RestaurantOrderManager {
 				static_cast<System::Int32>(static_cast<System::Byte>(224)));
 			this->pictureBox3->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pictureBox3.Image")));
 			this->pictureBox3->Location = System::Drawing::Point(629, 599);
-			this->pictureBox3->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->pictureBox3->Margin = System::Windows::Forms::Padding(4);
 			this->pictureBox3->Name = L"pictureBox3";
 			this->pictureBox3->Size = System::Drawing::Size(100, 68);
 			this->pictureBox3->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
@@ -237,7 +240,7 @@ namespace RestaurantOrderManager {
 				static_cast<System::Int32>(static_cast<System::Byte>(224)));
 			this->pictureBox4->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pictureBox4.Image")));
 			this->pictureBox4->Location = System::Drawing::Point(629, 470);
-			this->pictureBox4->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->pictureBox4->Margin = System::Windows::Forms::Padding(4);
 			this->pictureBox4->Name = L"pictureBox4";
 			this->pictureBox4->Size = System::Drawing::Size(100, 68);
 			this->pictureBox4->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
@@ -251,7 +254,7 @@ namespace RestaurantOrderManager {
 				static_cast<System::Int32>(static_cast<System::Byte>(224)));
 			this->pictureBox5->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pictureBox5.Image")));
 			this->pictureBox5->Location = System::Drawing::Point(629, 210);
-			this->pictureBox5->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->pictureBox5->Margin = System::Windows::Forms::Padding(4);
 			this->pictureBox5->Name = L"pictureBox5";
 			this->pictureBox5->Size = System::Drawing::Size(100, 68);
 			this->pictureBox5->SizeMode = System::Windows::Forms::PictureBoxSizeMode::StretchImage;
@@ -285,11 +288,11 @@ namespace RestaurantOrderManager {
 			this->Controls->Add(this->btnStaff);
 			this->Controls->Add(this->btnService);
 			this->Controls->Add(this->btnMenu);
-			this->Controls->Add(this->btnStatistics);
+			this->Controls->Add(this->btnCustomers);
 			this->Controls->Add(this->btnOrderList);
 			this->Controls->Add(this->picLogo);
 			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
-			this->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
+			this->Margin = System::Windows::Forms::Padding(4);
 			this->MinimumSize = System::Drawing::Size(833, 509);
 			this->Name = L"MainForm";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
@@ -361,6 +364,17 @@ private: System::Void BtnService_Click(System::Object^ sender, System::EventArgs
 	{
 		Service^ serviceForm = gcnew Service();
 		serviceForm->Show();
+	}
+}
+private: System::Void BtnCustomers_Click(System::Object^ sender, System::EventArgs^ e) 
+{
+	Form^ addingForm = Application::OpenForms["CustomersForm"];
+	if (addingForm != nullptr)
+		addingForm->BringToFront();
+	else
+	{
+		CustomersForm^ addingForm = gcnew CustomersForm();
+		addingForm->Show();
 	}
 }
 };

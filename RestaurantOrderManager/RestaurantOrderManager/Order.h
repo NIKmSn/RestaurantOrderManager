@@ -95,13 +95,19 @@ public:
 		SetTableId(tableId);
 		SetDate(date);
 	}
+	Order(Customer^ customer, int tableId, Invoice^ invoice, DateTime^ date)
+	{
+		SetCustomer(customer);
+		SetTableId(tableId);
+		SetInvoice(invoice);
+		SetDate(date);
+	}
 public: Order^ GetOrder(int id)
 {
 	SqlConnection^ conn = Database::CreateOpenConnection();
-	SqlCommand^ sqlCommand = Database::CreateStoredProcedureCommand("SELECT * FROM Orders WHERE Id = @id", conn);
+	SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Orders WHERE Id = @id", conn);
 	sqlCommand->Parameters->Add("@id", SqlDbType::Int)->Value = 1;
 	SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
-	conn->Close();
 
 	if (sqlReader->Read())
 	{
@@ -113,6 +119,7 @@ public: Order^ GetOrder(int id)
 		order->SetDate(Convert::ToDateTime(sqlReader["Date"]));
 		return order;
 	}
+	conn->Close();
 	return nullptr;
 }
 };

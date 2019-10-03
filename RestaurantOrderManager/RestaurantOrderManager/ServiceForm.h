@@ -5,6 +5,7 @@
 #include "Order.h"
 #include "Invoice.h"
 #include "Item.h"
+#include "Database.h"
 namespace RestaurantOrderManager {
 
 	using namespace System;
@@ -15,17 +16,23 @@ namespace RestaurantOrderManager {
 	using namespace System::Drawing;
 	using namespace System::IO;
 	using namespace System::Runtime::InteropServices;	
+	using namespace System::Globalization;
 	
 	/// <summary>
 	/// Summary for Service
 	/// </summary>
 	public ref class Service : public System::Windows::Forms::Form
 	{
-		String^ connStr = L"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Programs\\repos\\RestaurantOrderManager\\RestaurantOrderManager\\RestaurantDatabase\\Restaurant.mdf;Integrated Security=True;Connect Timeout=30";
-		SqlConnection^ myConnection;
-		SqlCommand^ sqlCommand = gcnew SqlCommand();
-		SqlDataAdapter^ sda = gcnew SqlDataAdapter();
-		SqlDataReader^ sqlReader;
+		List<Item^>^ items = gcnew List<Item^>();
+		double totalPrice;
+		SqlConnection^ myConnection = Database::CreateConnection();
+		SqlCommand^ sqlCommand = Database::CreateCommand();
+		SqlDataAdapter^ sda = Database::CreateDataAdapter();
+	private: System::Windows::Forms::Label^ lblTotal;
+	private: System::Windows::Forms::Label^ lblTotalCost;
+	private: System::Windows::Forms::Button^ btnCheck;
+
+			 SqlDataReader^ sqlReader;
 	public:
 		Service(void)
 		{
@@ -141,6 +148,7 @@ namespace RestaurantOrderManager {
 		try
 		{
 			cbName->Items->Clear();
+			cbName->Text = "";
 			sqlCommand->Parameters["@product_type"]->Value = cbDishType->GetItemText(cbDishType->SelectedItem);
 			sqlCommand->CommandText = "SELECT * FROM Product WHERE (Type = @product_type) ORDER BY Name";
 			myConnection->Open();
@@ -187,6 +195,9 @@ namespace RestaurantOrderManager {
 			this->groupEmployee = (gcnew System::Windows::Forms::GroupBox());
 			this->label5 = (gcnew System::Windows::Forms::Label());
 			this->cbEmployee = (gcnew System::Windows::Forms::ComboBox());
+			this->lblTotal = (gcnew System::Windows::Forms::Label());
+			this->lblTotalCost = (gcnew System::Windows::Forms::Label());
+			this->btnCheck = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dgvItems))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->BeginInit();
 			this->groupCustomer->SuspendLayout();
@@ -197,13 +208,18 @@ namespace RestaurantOrderManager {
 			// 
 			// dgvItems
 			// 
+			this->dgvItems->AllowUserToAddRows = false;
 			this->dgvItems->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dgvItems->EditMode = System::Windows::Forms::DataGridViewEditMode::EditProgrammatically;
 			this->dgvItems->Location = System::Drawing::Point(12, 96);
 			this->dgvItems->Name = L"dgvItems";
+			this->dgvItems->ReadOnly = true;
 			this->dgvItems->RowHeadersWidth = 51;
 			this->dgvItems->RowTemplate->Height = 24;
 			this->dgvItems->Size = System::Drawing::Size(484, 491);
 			this->dgvItems->TabIndex = 0;
+			this->dgvItems->UserDeletedRow += gcnew System::Windows::Forms::DataGridViewRowEventHandler(this, &Service::DgvItems_UserDeletedRow);
+			this->dgvItems->UserDeletingRow += gcnew System::Windows::Forms::DataGridViewRowCancelEventHandler(this, &Service::DgvItems_UserDeletingRow);
 			// 
 			// btnNewItem
 			// 
@@ -378,11 +394,51 @@ namespace RestaurantOrderManager {
 			this->cbEmployee->Size = System::Drawing::Size(282, 24);
 			this->cbEmployee->TabIndex = 46;
 			// 
+			// lblTotal
+			// 
+			this->lblTotal->AutoSize = true;
+			this->lblTotal->Font = (gcnew System::Drawing::Font(L"Calibri", 20.25F, System::Drawing::FontStyle::Italic, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->lblTotal->Location = System::Drawing::Point(5, 628);
+			this->lblTotal->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->lblTotal->Name = L"lblTotal";
+			this->lblTotal->Size = System::Drawing::Size(500, 41);
+			this->lblTotal->TabIndex = 47;
+			this->lblTotal->Text = L"Общая сумма заказа без скидки: ";
+			// 
+			// lblTotalCost
+			// 
+			this->lblTotalCost->AutoSize = true;
+			this->lblTotalCost->Font = (gcnew System::Drawing::Font(L"Calibri", 22.2F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->lblTotalCost->ForeColor = System::Drawing::SystemColors::HotTrack;
+			this->lblTotalCost->Location = System::Drawing::Point(527, 628);
+			this->lblTotalCost->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->lblTotalCost->Name = L"lblTotalCost";
+			this->lblTotalCost->Size = System::Drawing::Size(116, 46);
+			this->lblTotalCost->TabIndex = 48;
+			this->lblTotalCost->Text = L"0 руб.";
+			// 
+			// btnCheck
+			// 
+			this->btnCheck->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 16.2F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->btnCheck->Location = System::Drawing::Point(238, 706);
+			this->btnCheck->Name = L"btnCheck";
+			this->btnCheck->Size = System::Drawing::Size(484, 82);
+			this->btnCheck->TabIndex = 49;
+			this->btnCheck->Text = L"Завершить заказ";
+			this->btnCheck->UseVisualStyleBackColor = true;
+			this->btnCheck->Click += gcnew System::EventHandler(this, &Service::BtnCheck_Click);
+			// 
 			// Service
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(898, 822);
+			this->Controls->Add(this->btnCheck);
+			this->Controls->Add(this->lblTotalCost);
+			this->Controls->Add(this->lblTotal);
 			this->Controls->Add(this->groupEmployee);
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->groupCustomer);
@@ -401,14 +457,18 @@ namespace RestaurantOrderManager {
 			this->groupEmployee->ResumeLayout(false);
 			this->groupEmployee->PerformLayout();
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
 	private: System::Void Service_Load(System::Object^ sender, System::EventArgs^ e)
 	{
+		numQuantity->Maximum = 999;
+		numQuantity->Minimum = 1;
+		numTable->Maximum = 50;
+		numTable->Minimum = 1;
 		try
 		{
-			myConnection = gcnew SqlConnection(connStr);
 			sqlCommand->Connection = myConnection;
 			sqlCommand->Parameters->AddWithValue("@product_type", "");
 			sqlCommand->Parameters->AddWithValue("@product_name", "");
@@ -419,6 +479,11 @@ namespace RestaurantOrderManager {
 			FillDishName();
 			FillCustomerCombo();
 			FillStaffCombo();
+			items->Clear();
+			dgvItems->Columns->Add("name", "Название");
+			dgvItems->Columns->Add("quantity", "Количество");
+			dgvItems->Columns->Add("price", "Цена");
+
 		}
 		catch (Exception^ ex)
 		{
@@ -433,16 +498,11 @@ private: System::Void BtnNewItem_Click(System::Object^ sender, System::EventArgs
 {
 	try
 	{
-		myConnection->Open();
-		sqlCommand->Parameters["@product_name"]->Value = cbName->GetItemText(cbName->SelectedItem);
-		sqlCommand->CommandText = "SELECT Id FROM Product WHERE (Type = @product_type AND Name = @product_name)";
-		sqlCommand->Parameters["@item_productId"]->Value = sqlCommand->ExecuteScalar();
-		int productId = (int)sqlCommand->Parameters["@item_productId"]->Value;
-		Decimal quantity = numQuantity->Value;
-		Item^ newItem = gcnew Item();
-		
-		//dgvItems->Rows->Add();
-
+		Item^ newItem = gcnew Item(Product::GetProduct(cbName->GetItemText(cbName->SelectedItem)), Convert::ToInt32(numQuantity->Value));
+		items->Add(newItem);
+		dgvItems->Rows->Add(newItem->GetProduct()->GetName()->ToString(), newItem->GetQuantity().ToString(), newItem->GetCost().ToString("F2", CultureInfo::GetCultureInfo("ru-RU")));
+		totalPrice += Convert::ToDouble(newItem->GetCost());
+		lblTotalCost->Text = totalPrice.ToString("G", CultureInfo::GetCultureInfo("ru-RU")) + " руб.";
 	}
 	catch (Exception^ e)
 	{
@@ -467,6 +527,83 @@ private: System::Void BtnNewClient_Click(System::Object^ sender, System::EventAr
 private: System::Void CbCustomers_DropDown(System::Object^ sender, System::EventArgs^ e) 
 {
 	FillCustomerCombo();
+}
+private: System::Void BtnCheck_Click(System::Object^ sender, System::EventArgs^ e) 
+{
+	try
+	{
+		SqlCommand^ sqlCommand = Database::CreateCommand();
+		sqlCommand->Connection = myConnection;
+		Customer^ customer = Customer::GetCustomerByName(cbCustomers->GetItemText(cbCustomers->SelectedItem));
+		Employee^ employee = Employee::GetEmployeeByName(cbEmployee->GetItemText(cbEmployee->SelectedItem));
+		Invoice^ invoice = gcnew Invoice(customer, items, employee, totalPrice, DateTime::Now);
+		for each (Item ^ item in items)
+		{
+			item->SetInvoice(invoice);
+		}
+		Order^ order = gcnew Order(customer, Convert::ToInt32(numTable->Value), invoice, DateTime::Now);
+		totalPrice = invoice->GetCustomer()->CalcDiscount(totalPrice);
+		myConnection->Open();
+
+		sqlCommand->Parameters->Add("@customerId", System::Data::DbType::Int32)->Value = invoice->GetCustomer()->GetId();
+		sqlCommand->Parameters->Add("@employeeId", System::Data::DbType::Int32)->Value = invoice->GetEmployee()->GetId();
+		sqlCommand->Parameters->Add("@invoiceDate", System::Data::DbType::DateTime)->Value = invoice->GetDate();
+		sqlCommand->CommandText = "INSERT INTO Invoice (CustomerId, EmployeeId, Date) VALUES (@customerId, @employeeId, @invoiceDate)";
+		sqlCommand->ExecuteNonQuery();
+
+		for each (Item^ item in items)
+		{
+			SqlCommand^ sqlCommand = Database::CreateCommand("INSERT INTO Item (InvoiceId, ProductId, Quantity) VALUES (@invoiceId, @productId, @quantity)", myConnection);
+			sqlCommand->Parameters->Add("@invoiceId", System::Data::DbType::Int32)->Value = invoice->GetId();
+			sqlCommand->Parameters->Add("@productId", System::Data::DbType::Int32)->Value = item->GetProduct()->GetId();
+			sqlCommand->Parameters->Add("@quantity", System::Data::DbType::Int32)->Value = item->GetQuantity();
+			sqlCommand->ExecuteNonQuery();
+		}
+		sqlCommand->Parameters->Add("@tableId", System::Data::DbType::Int32)->Value = order->GetTableId();
+		sqlCommand->Parameters->Add("@invoiceId", System::Data::DbType::Int32)->Value = invoice->GetId();
+		sqlCommand->CommandText = "INSERT INTO Orders (CustomerId, TableId, InvoiceId, Date) VALUES (@customerId, @tableId, @invoiceId, @invoiceDate)";
+		sqlCommand->ExecuteNonQuery();
+		MessageBox::Show("Заказ успешно обработан.\nИтоговая сумма заказа с учетом скидки клиента - " + totalPrice.ToString("G", CultureInfo::GetCultureInfo("ru-RU")) + " руб.", "Успех", MessageBoxButtons::OK);
+		Close();
+	}
+	catch (Exception^ e)
+	{
+		MessageBox::Show(e->Message, "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
+	finally
+	{
+		myConnection->Close();
+	}
+}
+//Обработка события удаления позиции (строки) пользователем
+private: System::Void DgvItems_UserDeletingRow(System::Object^ sender, System::Windows::Forms::DataGridViewRowCancelEventArgs^ e) 
+{
+	if ( !e->Row->IsNewRow)
+	{
+		System::Windows::Forms::DialogResult response = MessageBox::Show("Вы уверены?", "Удаление позиции",
+			MessageBoxButtons::YesNo,
+			MessageBoxIcon::Question,
+			MessageBoxDefaultButton::Button2);
+		if (response == System::Windows::Forms::DialogResult::Yes)
+		{
+			if (dgvItems->SelectedRows->Count > 1)
+			{
+				for (int i = 0; i < dgvItems->SelectedRows->Count; i++)
+				{
+					dgvItems->Rows->RemoveAt(i);
+					totalPrice -= Convert::ToDouble(dgvItems->Rows[i]->Cells[2]->Value);
+				}
+			}
+			lblTotalCost->Text = totalPrice.ToString("G", CultureInfo::GetCultureInfo("ru-RU")) + " руб.";
+		}
+		if (response == System::Windows::Forms::DialogResult::No)
+			e->Cancel = true;
+	}
+}
+private: System::Void DgvItems_UserDeletedRow(System::Object^ sender, System::Windows::Forms::DataGridViewRowEventArgs^ e) 
+{
+	totalPrice -= Convert::ToDouble(e->Row->Cells[2]->Value);
+	lblTotalCost->Text = totalPrice.ToString("G", CultureInfo::GetCultureInfo("ru-RU")) + " руб.";
 }
 };
 }

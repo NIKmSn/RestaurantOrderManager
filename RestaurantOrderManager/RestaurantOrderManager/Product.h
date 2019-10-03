@@ -66,6 +66,17 @@ protected:
 			dishType = dishDictionary[0];
 		}
 	}
+	void SetDishType(String^ type)
+	{
+		if (dishDictionary->ContainsValue(type))
+		{
+			dishType = type;
+		}
+		else
+		{
+			dishType = dishDictionary[0];
+		}
+	}
 public:	
 	enum class DishType
 	{
@@ -130,6 +141,22 @@ public:
 			dishDictionary->Add((int)DishType::Other, "Другое");
 		}
 	}
+	static Product^ GetProduct(String^ name)
+	{
+		SqlConnection^ conn = Database::CreateOpenConnection();
+		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Product WHERE Name = @name", conn);
+		sqlCommand->Parameters->Add("@name", SqlDbType::NVarChar)->Value = name;
+		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
+		
+		if (sqlReader->Read())
+		{
+			Product^ product = gcnew Product(Convert::ToInt32(sqlReader["Id"]), sqlReader["Type"]->ToString(), name, sqlReader["Description"]->ToString(), Convert::ToDecimal(sqlReader["Price"]), sqlReader["Picture"]->ToString());
+			return product;
+		}
+		conn->Close();
+		return nullptr;
+
+	}
 	static Product^ GetProduct(int id)
 	{
 		if (productCache.ContainsKey(id))
@@ -137,17 +164,17 @@ public:
 			return productCache[id];
 		}
 		SqlConnection^ conn = Database::CreateOpenConnection();
-		SqlCommand^ sqlCommand = Database::CreateStoredProcedureCommand("SELECT * FROM Product WHERE Id = @id", conn);
+		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Product WHERE Id = @id", conn);
 		sqlCommand->Parameters->Add("@id", SqlDbType::Int)->Value = 1;
 		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
-		conn->Close();
-		
+
 		if (sqlReader->Read())
 		{
 			Product^ product = gcnew Product(id, Convert::ToInt32(sqlReader["Type"]), sqlReader["Name"]->ToString(), sqlReader["Description"]->ToString(), Convert::ToDecimal(sqlReader["Price"]), sqlReader["Picture"]->ToString());
 			productCache.Add(id, product);
 			return product;
 		}
+		conn->Close();
 		return nullptr;
 
 	}
@@ -198,6 +225,16 @@ public:
 		SetPhoto(photo);
 	}
 	Product(int id, int dishType, String^ name, String^ description, Decimal price, String^ photo)
+	{
+		SetId(id);
+		SetDishType(dishType);
+		SetName(name);
+		SetDescription(description);
+		SetPrice(price);
+		SetPhoto(photo);
+	}
+
+	Product(int id, String^ dishType, String^ name, String^ description, Decimal price, String^ photo)
 	{
 		SetId(id);
 		SetDishType(dishType);

@@ -2,7 +2,6 @@
 #include "Database.h"
 #include "Product.h"
 #include "Customer.h"
-#include "Item.h"
 #include "Employee.h"
 using namespace std;
 using namespace System;
@@ -17,117 +16,74 @@ using namespace System::Data::SqlClient;
 using namespace System::Data::SqlTypes;
 using namespace Microsoft::SqlServer::Server;
 using namespace System::Runtime::InteropServices;
+
+ref class Item;
 ref class Invoice
 {
 private:
 	int id;
 	Customer^ customer;
 	double totalPrice;
-	List<Item^>^ items;
+	List<Item^>^ items = gcnew List<Item^>();;
 	String^ paymentMethod;
 	Employee^ employee;
 	DateTime^ date;
-private: void SetId(int value)
-{
-	id = value;
-}
+private: void SetId(int value);
 protected:
 	//Методы заполнения полей класса
-	void SetId()
-	{
-		SqlConnection^ conn = Database::CreateConnection();
-		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT MAX(Id) FROM Invoice", conn);
-		conn->Open();
-		id = (int)sqlCommand->ExecuteScalar();
-		conn->Close();
-	}
-	void SetCustomer(Customer^ value)
-	{
-		customer = value;
-	}
+	void SetId();
+		
+	void SetCustomer(Customer^ value);
 
-	void SetPaymentMethod(String^ value)
-	{
-		paymentMethod = value;
-	}
+	void SetPaymentMethod(String^ value);
 
-	void SetTotal(double value)
-	{
-		totalPrice = value;
-	}
-
-	void SetItems(List<Item^>^ value)
-	{
-		for each (Item^ item in value)
-		{
-			items->Add(item);
-		}
-	}
-
-	void SetEmployee(Employee^ value)
-	{
-		employee = value;
-	}
-
-	void SetDate(DateTime^ value)
-	{
-		date = value;
-	}
-
+	void SetTotal(double value);
+		
+	void SetItems(List<Item^>^ value);
+		
+	void SetEmployee(Employee^ value);
+		
+	void SetDate(DateTime^ value);
+		
 public:
+	static Invoice^ invoiceInstance = gcnew Invoice();
 	//Методы чтения полей класса
-	int GetId()
-	{
-		return id;
-	}
+	int GetId();
+		
+	String^ GetPaymentMethod();
+		
+	Customer^ GetCustomer();
+		
+	double GetTotalPrice();
+		
+	List<Item^>^ GetItems();
 
-	String^ GetPaymentMethod()
-	{
-		return paymentMethod;
-	}
-
-	Customer^ GetCustomer()
-	{
-		return customer;
-	}
-
-	double GetTotalPrice()
-	{
-		return totalPrice;
-	}
-
-	List<Item^>^ GetItems()
-	{
-		List<Item^>^ result;
-		for each (Item^ item in items)
-		{
-			result->Add(item);
-		}
-		return result;	
-	}
-
-
-	Employee^ GetEmployee()
-	{
-		return employee;
-	}
-
-	DateTime^ GetDate()
-	{
-		return date;
-	}
+	Employee^ GetEmployee();
+		
+	DateTime^ GetDate();
+		
 
 	//Конструкторы
 	Invoice()
 	{
-		SetId(0);
+		SetId();
 		SetCustomer(gcnew Customer());
 		SetPaymentMethod("");
-		SetEmployee(nullptr);
+		SetEmployee(gcnew Employee());
 		SetDate(gcnew DateTime);
-		SetItems(nullptr);
+		//SetItems(items);
 		SetTotal(0);
 	}
+	Invoice(Customer^ customer, List<Item^>^ items, Employee^ employee, double totalPrice, DateTime^ date)
+	{
+		SetId();
+		SetCustomer(customer);
+		SetItems(items);
+		SetTotal(totalPrice);
+		SetEmployee(employee);
+		SetDate(date);
+	}
+
 	Invoice(int id, Customer^ customer, List<Item^>^ items, String^ paymentMethod, Employee^ employee, double totalPrice, DateTime^ date)
 	{
 		SetId(id);
@@ -138,65 +94,9 @@ public:
 		SetEmployee(employee);
 		SetDate(date);
 	}
-	public: static Invoice^ GetInvoice(SqlDataReader^ sqlReader)
-	{
-		if (sqlReader->Read())
-		{
-			Invoice^ invoice = gcnew Invoice();
-			invoice->SetId(Convert::ToInt32(sqlReader["Id"]));
-			invoice->SetCustomer(Customer::GetCustomer(Convert::ToInt32(sqlReader["CustomerId"])));
-			List<Item^>^ items = Item::GetItems(Convert::ToInt32(sqlReader["Id"]));
-			invoice->SetItems(items);
-			double total = 0;
-			for each (Item ^ item in items)
-			{
-				total += Convert::ToDouble(item->GetProduct()->GetPrice() * (1 - invoice->GetCustomer()->GetDiscount()));
-			}
-			invoice->SetTotal(total);
-			invoice->SetEmployee(Employee::GetEmployee(Convert::ToInt32(sqlReader["EmployeeId"])));
-			invoice->SetDate(Convert::ToDateTime(sqlReader["Date"]));
-			return invoice;
-		}
-		return nullptr;
-	}
-	public: static Invoice^ GetInvoice(int id)
-	{
-		SqlConnection^ conn = Database::CreateOpenConnection();
-		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Invoice WHERE Id = @id", conn);
-		sqlCommand->Parameters->Add("@id", SqlDbType::Int)->Value = 1;
-		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
-
-		if (sqlReader->Read())
-		{
-			Invoice^ invoice = gcnew Invoice();
-			invoice->SetId(id);
-			invoice->SetCustomer(Customer::GetCustomer(Convert::ToInt32(sqlReader["CustomerId"])));
-			List<Item^>^ items = Item::GetItems(Convert::ToInt32(sqlReader["Id"]));
-			invoice->SetItems(items);
-			double total = 0;
-			for each (Item ^ item in items)
-			{
-				total += Convert::ToDouble(item->GetProduct()->GetPrice() * (1 - invoice->GetCustomer()->GetDiscount()));
-			}
-			invoice->SetTotal(total);
-			invoice->SetEmployee(Employee::GetEmployee(Convert::ToInt32(sqlReader["EmployeeId"])));
-			invoice->SetDate(Convert::ToDateTime(sqlReader["Date"]));
-			return invoice;
-		}
-		return nullptr;
-	}
-	public: static List<Invoice^>^ GetInvoices()
-	{
-		List<Invoice^>^ invoices;
-		SqlConnection^ conn = Database::CreateOpenConnection();
-		SqlCommand^ sqlCommand = Database::CreateCommand("SELECT * FROM Invoice", conn);
-		SqlDataReader^ sqlReader = sqlCommand->ExecuteReader();
-		while (sqlReader->Read())
-		{
-			invoices->Add(GetInvoice(sqlReader));
-		}
-		conn->Close();
-		return invoices;
-	}
+public: static Invoice^ GetInvoice(SqlDataReader^ sqlReader);
+	
+public: static Invoice^ GetInvoice(int id);
+	
+public: static List<Invoice^>^ GetInvoices();
 };
-
