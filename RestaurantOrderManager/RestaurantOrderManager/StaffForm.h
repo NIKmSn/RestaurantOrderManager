@@ -142,7 +142,6 @@ namespace RestaurantOrderManager {
 				btnEdit->Enabled = false;
 			}
 		}
-	protected:
 
 	private:
 		/// <summary>
@@ -343,7 +342,6 @@ private: System::Void BtnEdit_Click(System::Object^ sender, System::EventArgs^ e
 	SqlCommandBuilder^ sqlCommandBuilder = gcnew SqlCommandBuilder(sda);
 	sqlCommandBuilder->GetUpdateCommand()->UpdatedRowSource = UpdateRowSource::OutputParameters;
 	String^ command = sqlCommandBuilder->GetInsertCommand()->CommandText;
-	/*sqlCommandBuilder->GetUpdateCommand()->CommandText = "UPDATE [Employee] SET [Photo] = @p1, [Name] = @p2, [PhoneNumber] = @p3, [Title] = @p4, [Salary] = @p5 WHERE (([ID] = @p6) AND ([Name] = @p7) AND ([PhoneNumber] = @p8) AND ([Title] = @p9) AND ([Salary] = @p10))";*/
 	sda->UpdateCommand = sqlCommandBuilder->GetUpdateCommand();
 	sda->InsertCommand = sqlCommandBuilder->GetInsertCommand();
 	sda->DeleteCommand = sqlCommandBuilder->GetDeleteCommand();

@@ -73,7 +73,7 @@ namespace RestaurantOrderManager {
 				{
 					if (!String::IsNullOrEmpty(numericUpDown1->Value.ToString()))
 					{
-						Decimal discount = numericUpDown1->Value;
+						Decimal discount = System::Decimal::Divide(numericUpDown1->Value, 100);
 
 						Customer^ newCustomer = gcnew Customer(tbName->Text, tbPhoneNumber->Text, tbEmail->Text, discount);
 						return newCustomer;
@@ -158,9 +158,9 @@ namespace RestaurantOrderManager {
 			this->lblSalary->Location = System::Drawing::Point(48, 258);
 			this->lblSalary->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->lblSalary->Name = L"lblSalary";
-			this->lblSalary->Size = System::Drawing::Size(55, 17);
+			this->lblSalary->Size = System::Drawing::Size(81, 17);
 			this->lblSalary->TabIndex = 19;
-			this->lblSalary->Text = L"Скидка";
+			this->lblSalary->Text = L"Скидка (%)";
 			// 
 			// lblTitle
 			// 
@@ -273,11 +273,13 @@ namespace RestaurantOrderManager {
 		}
 		else
 		{
-			MessageBox::Show("Не удалось добавить нового сотрудника", "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+			MessageBox::Show("Не удалось добавить нового клиента", "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
 		}
 	}
 	private: System::Void AddNewClientForm_Load(System::Object^ sender, System::EventArgs^ e)
 	{
+		numericUpDown1->Maximum = 100;
+		numericUpDown1->Minimum = 0;
 		try
 		{
 			myConnection = gcnew SqlConnection(connStr);
